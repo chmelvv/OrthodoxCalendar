@@ -1,6 +1,6 @@
 package info.pomisna.OrthodoxCalendar;
 
-import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,21 +28,13 @@ public class CalendarTest {
         assertThat(numberOfDaysInMonth(year, yearMonth), equalTo(daysInMonthExpected));
     }
 
-    @Test
-    public void convertionTest(){
-        LocalDate christmasOldStyle = getOldStyleDate(2020, 01, 07);
-        assertThat(christmasOldStyle.getMonthOfYear(), equalTo(12));
-        assertThat(christmasOldStyle.getDayOfMonth(), equalTo(25));
-    }
-
-    @Test
-    public void saintFathersWeekDayTest(){
-        int year = 2021;
-        LocalDate easter_prev = getEasterDateOldStyle(year-1); // Пасха в предыдущем году
-        DateTime saintFathersWeekDayInPreviousYear = getSaintFathersWeekDayOldStyle(year - 1);
-//        int f_e = Days.daysBetween(easter_prev, saintFathersWeekDayInPreviousYear).getDays();
-//        System.out.println("Easter prev:" + easter_prev.toString());
-//        System.out.println("saintFathersWeekDay prev:" + saintFathersWeekDayInPreviousYear.toString());
-//        System.out.println("Days between: " + f_e);
+    @ParameterizedTest
+    @CsvSource({"2020,259", "2021,245"})
+    public void daysBetweenEasterAndSaintFathersWeekDayTest(int year, int expectedDays){
+        LocalDate easter_prev = getEasterDate(year);
+        LocalDate saintFathersWeekDayInPreviousYear = getSaintFathersWeekDay(year);
+        assertThat(
+                Days.daysBetween(easter_prev, saintFathersWeekDayInPreviousYear).getDays(),
+                equalTo(expectedDays));
     }
 }
