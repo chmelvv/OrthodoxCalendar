@@ -102,48 +102,62 @@ public class Utils {
     // Функция определяет название Седмицы (Недели) по годичному кругу богослужений
     public static String ortcal_sedmica(int month, int day, int year){
         LocalDate date = new LocalDate(year, month, day, JulianChronology.getInstance());
-        int cd = date.getDayOfYear(); // Порядковый номер дня в году
-        int ed = ortcal_easter(year).getDayOfYear();									// Порядковый номер дня пасхи в году
-        int wd = date.dayOfWeek().get(); 	// Порядковый номер дня недели от 0 (воскресенье) до 6 (суббота)
-        //TODO
-//if ($cd < $ed-70) {				// До Недели о мытаре и фарисее идут седмицы по Пятидесятнице прошлого года
-//		$ed = ortcal_easter('z', $year-1);								// Порядковый номер дня пасхи в предыдущем году
-//		$nw = (int)(($cd+(ortcal_isLeap($year-1)?366:365)-($ed+49))/7)+1;
-//		if ($wd == 0) return __("Неделя", 'bg_ortcal')." ".($nw-1).__("-я по Пятидесятнице", 'bg_ortcal');
-//		else return __("Седмица", 'bg_ortcal')." ".$nw.__("-я по Пятидесятнице", 'bg_ortcal');
-//	}
-//	else if ($cd == $ed-70) return __("Неделя о мытаре и фарисее", 'bg_ortcal');	// Седмицы подготовительные
-//	else if ($cd < $ed-63) return __("Седмица о мытаре и фарисее", 'bg_ortcal');
-//	else if ($cd == $ed-63) return __("Неделя о блудном сыне", 'bg_ortcal');
-//	else if ($cd < $ed-56) return __("Седмица о блудном сыне", 'bg_ortcal');
-//	else if ($cd == $ed-56) return __("Неделя мясопустная, о Страшнем суде", 'bg_ortcal');
-//	else if ($cd < $ed-49) return __("Сырная седмица (масленица)", 'bg_ortcal');
-//	else if ($cd == $ed-49) return __("Неделя сыропустная. Воспоминание Адамова изгнания. Прощеное воскресенье", 'bg_ortcal');
-//	else if ($cd < $ed-13) {									// Седмицы Великого поста
-//		$nw = (int)(($cd - ($ed-49))/7)+1;
-//		if ($wd == 0) return __("Неделя", 'bg_ortcal')." ".($nw-1).__("-я Великого поста", 'bg_ortcal');
-//		else return __("Седмица", 'bg_ortcal')." ".$nw.__("-я Великого поста", 'bg_ortcal');
-//	}
-//	else if ($cd < $ed-7) return __("Седмица 6-я Великого поста (седмица ваий)", 'bg_ortcal');
-//	else if ($cd == $ed-7) return __("Неделя 6-я Великого поста ваий (цветоносная, Вербное воскресенье)", 'bg_ortcal');
-//	else if ($cd < $ed) return __("Страстная седмица", 'bg_ortcal');
-//	else if ($cd == $ed) return "";
-//	else if ($cd < $ed+7) return __("Пасхальная (Светлая) седмица", 'bg_ortcal');
-//	else if ($cd < $ed+50) {									// Седмицы по Пасхе
-//		$nw = (int)(($cd - $ed)/7)+1;
-//		if ($wd == 0) return __("Неделя", 'bg_ortcal')." ".$nw.__("-я по Пасхе", 'bg_ortcal');
-//		else return __("Седмица", 'bg_ortcal')." ".$nw.__("-я по Пасхе", 'bg_ortcal');
-//	}
-//	else  {														// Седмицы по Пятидесятнице
-//		$nw = (int)(($cd - ($ed+49))/7)+1;
-//		if ($wd == 0) return __("Неделя", 'bg_ortcal')." ".($nw-1).__("-я по Пятидесятнице", 'bg_ortcal');
-//		else {
-//			if ($nw==1) return __("Седмица 1-я по Пятидесятнице (Троицкая)", 'bg_ortcal');
-//			else return __("Седмица", 'bg_ortcal')." ".$nw.__("-я по Пятидесятнице", 'bg_ortcal');
-//		}
-//	}
+        int dayOfYear = date.getDayOfYear(); // Порядковый номер дня в году
+        int easterDayOfYear = ortcal_easter(year).getDayOfYear(); // Порядковый номер дня пасхи в году
+        int dayOfWeek = date.dayOfWeek().get(); // Порядковый номер дня недели от 0 (воскресенье) до 6 (суббота)
+        int nw;
 
-        return "";
+    if (dayOfYear < easterDayOfYear-70) { // До Недели о мытаре и фарисее идут седмицы по Пятидесятнице прошлого года
+		easterDayOfYear = ortcal_easter(year-1).getDayOfYear(); // Порядковый номер дня пасхи в предыдущем году
+		nw = ((dayOfYear + (ortcal_isLeap(year-1) ? 366:365) - (easterDayOfYear + 49)) / 7) + 1;
+		if (dayOfWeek == 0) {
+		    return messages.getString("Неделя") + " " + (nw - 1) + messages.getString("-я_по_Пятидесятнице");
+        } else {
+            return messages.getString("Седмица") + " " + nw + messages.getString("-я_по_Пятидесятнице");
+        }
+	} else if (dayOfYear == easterDayOfYear  - 70) return messages.getString("Неделя_о_мытаре_и_фарисее");	// Седмицы подготовительные
+        else if (dayOfYear < easterDayOfYear  - 63) return messages.getString("Седмица_о_мытаре_и_фарисее");
+        else if (dayOfYear == easterDayOfYear  - 63) return messages.getString("Неделя_о_блудном_сыне");
+	    else if (dayOfYear < easterDayOfYear  - 56) return messages.getString("Седмица_о_блудном_сыне");
+	    else if (dayOfYear == easterDayOfYear  - 56) return messages.getString("Неделя_мясопустная,_о_Страшнем_суде");
+	    else if (dayOfYear < easterDayOfYear  - 49) return messages.getString("Сырная_седмица_(масленица)");
+	    else if (dayOfYear == easterDayOfYear  - 49) return messages.getString("Неделя_сыропустная._Воспоминание_Адамова_изгнания._Прощеное_воскресенье");
+	    else if (dayOfYear < easterDayOfYear  - 13) { // Седмицы Великого поста
+		    nw = (int)((dayOfYear - (easterDayOfYear  - 49))/7)+1;
+		    if (dayOfWeek == 0) {
+		        return messages.getString("Неделя") + " " + (nw  - 1) + messages.getString("-я_Великого_поста");
+            }
+		    else {
+		        return messages.getString("Седмица") + " " + nw + messages.getString("-я_Великого_поста");
+            }
+	    }
+	    else if (dayOfYear < easterDayOfYear  - 7) return messages.getString("Седмица_6-я_Великого_поста_(седмица_ваий)");
+	    else if (dayOfYear == easterDayOfYear  - 7) return messages.getString("Неделя_6-я_Великого_поста_ваий_(цветоносная,_Вербное_воскресенье)");
+	    else if (dayOfYear < easterDayOfYear) return messages.getString("Страстная_седмица");
+	    else if (dayOfYear == easterDayOfYear) return "";
+	    else if (dayOfYear < easterDayOfYear+7) return messages.getString("Пасхальная_(Светлая)_седмица");
+	    else if (dayOfYear < easterDayOfYear+50) {									// Седмицы по Пасхе
+		    nw = (int)((dayOfYear - easterDayOfYear) / 7) +1;
+		if (dayOfWeek == 0) {
+		    return messages.getString("Неделя") + " " + nw + messages.getString("-я_по_Пасхе");
+        }
+		else {
+		    return messages.getString("Седмица") + " " + nw + messages.getString("-я_по_Пасхе");
+        }
+	    } else {														// Седмицы по Пятидесятнице
+		    nw = (int)((dayOfYear - (easterDayOfYear + 49)) / 7) + 1;
+		    if (dayOfWeek == 0) {
+		        return messages.getString("Неделя") + " " + (nw  - 1) + messages.getString("-я_по_Пятидесятнице");
+            } else {
+			    if (nw==1) {
+			        return messages.getString("Седмица_1-я_по_Пятидесятнице_(Троицкая)");
+                } else {
+			    return messages.getString("Седмица") + " " + nw + messages.getString("-я_по_Пятидесятнице");
+                }
+		    }
+	    }
+
+        //return "";
     }
 
     public static Long getEasterDateDiff(LocalDate date) {

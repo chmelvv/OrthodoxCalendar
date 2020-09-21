@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static info.pomisna.OrthodoxCalendar.Utils.*;
+import static info.pomisna.OrthodoxCalendar.Utils.ortcal_sedmica;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -56,7 +57,13 @@ public class CalendarTest {
 
     @Test
     void sedmicaTest() {
-        assertThat("", ortcal_sedmica(12,24,2019), equalTo(""));
+        LocalDate startDate = LocalDate.parse("2020-01-01");
+        LocalDate endDate = LocalDate.parse("2021-01-01");
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1))
+        {
+            System.out.println(date.toString() + ": " + ortcal_sedmica(date.getMonthOfYear(), date.getDayOfMonth(), 2020));
+        }
+        //assertThat(ortcal_sedmica(12,24,2019), equalTo(""));
     }
 
 }
