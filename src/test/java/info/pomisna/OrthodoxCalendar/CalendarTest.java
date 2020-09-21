@@ -14,7 +14,7 @@ public class CalendarTest {
 
     @Test
     public void daysBetweenOldAndNewStyleTest(){
-        assertThat(daysBetweenOldAndNewStyle(2020), equalTo(13));
+        assertThat(ortcal_dd(2020), equalTo(13));
     }
 
     @Test
@@ -31,10 +31,32 @@ public class CalendarTest {
     @ParameterizedTest
     @CsvSource({"2020,259", "2021,245"})
     public void daysBetweenEasterAndSaintFathersWeekDayTest(int year, int expectedDays){
-        LocalDate easter_prev = getEasterDate(year);
+        LocalDate easter_prev = ortcal_easter(year);
         LocalDate saintFathersWeekDayInPreviousYear = getSaintFathersWeekDay(year);
         assertThat(
                 Days.daysBetween(easter_prev, saintFathersWeekDayInPreviousYear).getDays(),
                 equalTo(expectedDays));
     }
+
+    @ParameterizedTest
+    @CsvSource({"2020,2,29", "2019,3,31"})
+    public void ortcalNumDaysTEst(int year, int month, int expectedDaysInMonth){
+        assertThat("Is in year:" + year + ", month:" + month + " has " + expectedDaysInMonth + " days?",
+                ortcal_numDays(year, month),
+                equalTo(expectedDaysInMonth));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"2020-02-29,1,2020-03-01", "2019-05-01,5,2019-05-06"})
+    public void  addDaysTest(LocalDate date, int days, LocalDate expectedDate){
+        assertThat(
+                ortcal_add_days(date, days),
+                equalTo(expectedDate));
+    }
+
+    @Test
+    void sedmicaTest() {
+        assertThat("", ortcal_sedmica(12,24,2019), equalTo(""));
+    }
+
 }

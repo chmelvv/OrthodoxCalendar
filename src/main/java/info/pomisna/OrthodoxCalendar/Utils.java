@@ -18,15 +18,43 @@ import static info.pomisna.OrthodoxCalendar.CalendarEvent.EPIPHANY;
 public class Utils {
     static Locale currentLocale = new Locale("uk", "UA");
     static ResourceBundle messages = ResourceBundle.getBundle("languages\\Messages", currentLocale);
-    public static int daysBetweenOldAndNewStyle(int year) {
+
+    // Функция определяет является ли указанный год високосным
+    public static boolean ortcal_isLeap(int year){
+        return Year.isLeap(year);
+    }
+
+    // Функция определяет количество дней в месяце
+    public static int ortcal_numDays(int year, int month){
+        DateTime dateTime = new DateTime(year, month, 14, 12, 0, 0, 000);
+        return dateTime.dayOfMonth().getMaximumValue();
+    }
+
+    // Функция возвращает количество дней между датами по новому и старому стилю
+    public static int ortcal_dd(int year) {
         return (year - year % 100) / 100 - (year - year % 400) / 400 - 2;
     }
 
-    public static LocalDate getOldStyleDate(LocalDate newStyleDate) {
+    // Функция добавляет заданное количество дней к дате, заданной в виде int
+    public static LocalDate ortcal_add_days(LocalDate date, int days) {
+        return date.plusDays(days);
+    }
+
+    // Функция возвращает дату по старому стилю
+    public static LocalDate ortcal_oldStyle(LocalDate newStyleDate) {
         return newStyleDate
                 .toDateTimeAtStartOfDay()
                 .withChronology(JulianChronology.getInstance())
                 .toLocalDate();
+    }
+
+    // Функция возвращает дату по старому стилю
+    public static LocalDate ortcal_oldStyle(int year, int month, int day) {
+        LocalDate localDate = new LocalDate(JulianChronology.getInstance());
+        return localDate
+                .withYear(year)
+                .withMonthOfYear(month)
+                .withDayOfMonth(day);
     }
 
     public static LocalDate getNewStyleDate(LocalDate oldStyle) {
@@ -36,26 +64,9 @@ public class Utils {
                 .toLocalDate();
     }
 
-    //
-//    public static LocalDate getNewStyleDate(LocalDate oldStyleDate){
-//        LocalDate localDate = new LocalDate();
-//        return localDate
-//                .withYear(oldStyleDate.getYear())
-//                .withMonthOfYear(oldStyleDate.getMonthOfYear())
-//                .withDayOfMonth(oldStyleDate.getDayOfMonth());
-//    }
-//
-    public static LocalDate getOldStyleDate(int year, int month, int day) {
-        LocalDate localDate = new LocalDate(JulianChronology.getInstance());
-        return localDate
-                .withYear(year)
-                .withMonthOfYear(month)
-                .withDayOfMonth(day);
-    }
-
     public static int daysBetweenOldAndNewStyle2(int year) {
         LocalDate newStyleDate = LocalDate.parse(String.valueOf(year));
-        LocalDate tempDate = getOldStyleDate(newStyleDate);
+        LocalDate tempDate = ortcal_oldStyle(newStyleDate);
         LocalDate oldStyleDate = new LocalDate(
                 tempDate.getYear(),
                 tempDate.getMonthOfYear(),
@@ -68,7 +79,8 @@ public class Utils {
         return YearMonth.of(year, month).lengthOfMonth();
     }
 
-    public static LocalDate getEasterDate(int y) {
+    // Функция определяет день Пасхи на заданный год по СТАРОМУ стилю
+    public static LocalDate ortcal_easter(int y) {
         int a = (19 * (y % 19) + 15) % 30;
         int b = (2 * (y % 4) + 4 * (y % 7) + 6 * a + 6) % 7;
         int m, d;
@@ -80,17 +92,64 @@ public class Utils {
             d = f + 22;
             m = 3;
         }
-        return getOldStyleDate(y, m, d);
+        return ortcal_oldStyle(y, m, d);
     }
 
     public static LocalDate getEasterDateNewStyle(int y) {
-        return getEasterDate(y).plusDays(daysBetweenOldAndNewStyle(y));
+        return ortcal_easter(y).plusDays(ortcal_dd(y));
+    }
+
+    // Функция определяет название Седмицы (Недели) по годичному кругу богослужений
+    public static String ortcal_sedmica(int month, int day, int year){
+        LocalDate date = new LocalDate(year, month, day, JulianChronology.getInstance());
+        int cd = date.getDayOfYear(); // Порядковый номер дня в году
+        int ed = ortcal_easter(year).getDayOfYear();									// Порядковый номер дня пасхи в году
+        int wd = date.dayOfWeek().get(); 	// Порядковый номер дня недели от 0 (воскресенье) до 6 (суббота)
+        //TODO
+//if ($cd < $ed-70) {				// До Недели о мытаре и фарисее идут седмицы по Пятидесятнице прошлого года
+//		$ed = ortcal_easter('z', $year-1);								// Порядковый номер дня пасхи в предыдущем году
+//		$nw = (int)(($cd+(ortcal_isLeap($year-1)?366:365)-($ed+49))/7)+1;
+//		if ($wd == 0) return __("Неделя", 'bg_ortcal')." ".($nw-1).__("-я по Пятидесятнице", 'bg_ortcal');
+//		else return __("Седмица", 'bg_ortcal')." ".$nw.__("-я по Пятидесятнице", 'bg_ortcal');
+//	}
+//	else if ($cd == $ed-70) return __("Неделя о мытаре и фарисее", 'bg_ortcal');	// Седмицы подготовительные
+//	else if ($cd < $ed-63) return __("Седмица о мытаре и фарисее", 'bg_ortcal');
+//	else if ($cd == $ed-63) return __("Неделя о блудном сыне", 'bg_ortcal');
+//	else if ($cd < $ed-56) return __("Седмица о блудном сыне", 'bg_ortcal');
+//	else if ($cd == $ed-56) return __("Неделя мясопустная, о Страшнем суде", 'bg_ortcal');
+//	else if ($cd < $ed-49) return __("Сырная седмица (масленица)", 'bg_ortcal');
+//	else if ($cd == $ed-49) return __("Неделя сыропустная. Воспоминание Адамова изгнания. Прощеное воскресенье", 'bg_ortcal');
+//	else if ($cd < $ed-13) {									// Седмицы Великого поста
+//		$nw = (int)(($cd - ($ed-49))/7)+1;
+//		if ($wd == 0) return __("Неделя", 'bg_ortcal')." ".($nw-1).__("-я Великого поста", 'bg_ortcal');
+//		else return __("Седмица", 'bg_ortcal')." ".$nw.__("-я Великого поста", 'bg_ortcal');
+//	}
+//	else if ($cd < $ed-7) return __("Седмица 6-я Великого поста (седмица ваий)", 'bg_ortcal');
+//	else if ($cd == $ed-7) return __("Неделя 6-я Великого поста ваий (цветоносная, Вербное воскресенье)", 'bg_ortcal');
+//	else if ($cd < $ed) return __("Страстная седмица", 'bg_ortcal');
+//	else if ($cd == $ed) return "";
+//	else if ($cd < $ed+7) return __("Пасхальная (Светлая) седмица", 'bg_ortcal');
+//	else if ($cd < $ed+50) {									// Седмицы по Пасхе
+//		$nw = (int)(($cd - $ed)/7)+1;
+//		if ($wd == 0) return __("Неделя", 'bg_ortcal')." ".$nw.__("-я по Пасхе", 'bg_ortcal');
+//		else return __("Седмица", 'bg_ortcal')." ".$nw.__("-я по Пасхе", 'bg_ortcal');
+//	}
+//	else  {														// Седмицы по Пятидесятнице
+//		$nw = (int)(($cd - ($ed+49))/7)+1;
+//		if ($wd == 0) return __("Неделя", 'bg_ortcal')." ".($nw-1).__("-я по Пятидесятнице", 'bg_ortcal');
+//		else {
+//			if ($nw==1) return __("Седмица 1-я по Пятидесятнице (Троицкая)", 'bg_ortcal');
+//			else return __("Седмица", 'bg_ortcal')." ".$nw.__("-я по Пятидесятнице", 'bg_ortcal');
+//		}
+//	}
+
+        return "";
     }
 
     public static Long getEasterDateDiff(LocalDate date) {
-        long easterDiff = date.getDayOfYear() - getEasterDate(date.getYear()).getDayOfYear();
+        long easterDiff = date.getDayOfYear() - ortcal_easter(date.getYear()).getDayOfYear();
         if (easterDiff < -104) {
-            easterDiff = Days.daysBetween(getEasterDate(date.minusYears(1).getYear()), date).getDays();
+            easterDiff = Days.daysBetween(ortcal_easter(date.minusYears(1).getYear()), date).getDays();
         }
         return easterDiff;
     }
@@ -112,13 +171,13 @@ public class Utils {
     public static void dayEvents(int year, int month, int day) {
         // Дата по старому стилю
         LocalDate date = new LocalDate(year, month, day, JulianChronology.getInstance());
-        LocalDate easter = getEasterDate(year); // Пасха в текущем году
+        LocalDate easter = ortcal_easter(year); // Пасха в текущем году
         int os_year = date.getYear(); // Год по старому стилю
-        int dd = daysBetweenOldAndNewStyle(os_year); // Отклонение григорианского календаря от юлианского в днях
+        int dd = ortcal_dd(os_year); // Отклонение григорианского календаря от юлианского в днях
         boolean leap = Year.isLeap(date.getYear()); // true - если високосный год по старому стилю
         LocalDate ny = new LocalDate(year, 1, 1);  // Новый год по григорианскому календарю
 
-        LocalDate easter_prev = getEasterDate(year - 1); // Пасха в предыдущем году
+        LocalDate easter_prev = ortcal_easter(year - 1); // Пасха в предыдущем году
         int f_e = Days.daysBetween(getSaintFathersWeekDay(year-1), easter_prev).getDays(); // Кол-во дней до Недели св.отцов от Пасхи
         int ep_e = Days.daysBetween(easter, getSundayBeforeEpiphany(year)).getDays(); // Кол-во дней до Недели перед Богоявлением от Пасхи
         int wd = date.getDayOfWeek();
