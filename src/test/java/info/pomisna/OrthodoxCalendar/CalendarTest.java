@@ -7,7 +7,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static info.pomisna.OrthodoxCalendar.Utils.*;
-import static info.pomisna.OrthodoxCalendar.Utils.ortcal_sedmica;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -55,15 +54,16 @@ public class CalendarTest {
                 equalTo(expectedDate));
     }
 
-    @Test
-    void sedmicaTest() {
-        LocalDate startDate = LocalDate.parse("2020-01-01");
-        LocalDate endDate = LocalDate.parse("2021-01-01");
-        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1))
-        {
-            System.out.println(date.toString() + ": " + ortcal_sedmica(date.getMonthOfYear(), date.getDayOfMonth(), 2020));
-        }
-        //assertThat(ortcal_sedmica(12,24,2019), equalTo(""));
+    @ParameterizedTest
+    @CsvSource({"2020-01-01, Тиждень 31-й по П'ятидесятниці",
+                "2020-01-27, Неділя про митаря і фарисея",
+                "2020-02-12, Сирний тиждень (масниця)",
+                "2020-03-01, Тиждень 2-й Великого посту",
+                "2020-04-11, Пасхальний (Світлий) тиждень",
+                "2020-05-05, Тиждень 5-й по Пасці",
+                "2020-05-29, Тиждень 1-й П'ятидесятниці (троїцький)",
+                "2020-09-19, Тиждень 17-й по П'ятидесятниці"})
+    void sedmicaTest(LocalDate date, String expectedWeekName) {
+        assertThat(ortcal_sedmica(date.getMonthOfYear(), date.getDayOfMonth(), date.getYear()), equalTo(expectedWeekName));
     }
-
 }

@@ -107,9 +107,9 @@ public class Utils {
         int dayOfWeek = date.dayOfWeek().get(); // Порядковый номер дня недели от 0 (воскресенье) до 6 (суббота)
         int nw;
 
-    if (dayOfYear < easterDayOfYear-70) { // До Недели о мытаре и фарисее идут седмицы по Пятидесятнице прошлого года
-		easterDayOfYear = ortcal_easter(year-1).getDayOfYear(); // Порядковый номер дня пасхи в предыдущем году
-		nw = ((dayOfYear + (ortcal_isLeap(year-1) ? 366:365) - (easterDayOfYear + 49)) / 7) + 1;
+    if (dayOfYear < easterDayOfYear - 70) { // До Недели о мытаре и фарисее идут седмицы по Пятидесятнице прошлого года
+		easterDayOfYear = ortcal_easter(year - 1).getDayOfYear(); // Порядковый номер дня пасхи в предыдущем году
+		nw = ((dayOfYear + (ortcal_isLeap(year - 1) ? 366:365) - (easterDayOfYear + 49)) / 7) + 1;
 		if (dayOfWeek == 0) {
 		    return messages.getString("Неделя") + " " + (nw - 1) + messages.getString("-я_по_Пятидесятнице");
         } else {
@@ -123,7 +123,7 @@ public class Utils {
 	    else if (dayOfYear < easterDayOfYear  - 49) return messages.getString("Сырная_седмица_(масленица)");
 	    else if (dayOfYear == easterDayOfYear  - 49) return messages.getString("Неделя_сыропустная._Воспоминание_Адамова_изгнания._Прощеное_воскресенье");
 	    else if (dayOfYear < easterDayOfYear  - 13) { // Седмицы Великого поста
-		    nw = (int)((dayOfYear - (easterDayOfYear  - 49))/7)+1;
+		    nw = (int)((dayOfYear - (easterDayOfYear  - 49)) / 7) + 1;
 		    if (dayOfWeek == 0) {
 		        return messages.getString("Неделя") + " " + (nw  - 1) + messages.getString("-я_Великого_поста");
             }
@@ -135,29 +135,27 @@ public class Utils {
 	    else if (dayOfYear == easterDayOfYear  - 7) return messages.getString("Неделя_6-я_Великого_поста_ваий_(цветоносная,_Вербное_воскресенье)");
 	    else if (dayOfYear < easterDayOfYear) return messages.getString("Страстная_седмица");
 	    else if (dayOfYear == easterDayOfYear) return "";
-	    else if (dayOfYear < easterDayOfYear+7) return messages.getString("Пасхальная_(Светлая)_седмица");
-	    else if (dayOfYear < easterDayOfYear+50) {									// Седмицы по Пасхе
-		    nw = (int)((dayOfYear - easterDayOfYear) / 7) +1;
+	    else if (dayOfYear < easterDayOfYear + 7) return messages.getString("Пасхальная_(Светлая)_седмица");
+	    else if (dayOfYear < easterDayOfYear + 50) { // Седмицы по Пасхе
+		    nw = (int)((dayOfYear - easterDayOfYear) / 7) + 1;
 		if (dayOfWeek == 0) {
 		    return messages.getString("Неделя") + " " + nw + messages.getString("-я_по_Пасхе");
         }
 		else {
 		    return messages.getString("Седмица") + " " + nw + messages.getString("-я_по_Пасхе");
         }
-	    } else {														// Седмицы по Пятидесятнице
-		    nw = (int)((dayOfYear - (easterDayOfYear + 49)) / 7) + 1;
-		    if (dayOfWeek == 0) {
-		        return messages.getString("Неделя") + " " + (nw  - 1) + messages.getString("-я_по_Пятидесятнице");
+	    } else {                                                        // Седмицы по Пятидесятнице
+        nw = (int) ((dayOfYear - (easterDayOfYear + 49)) / 7) + 1;
+        if (dayOfWeek == 0) {
+            return messages.getString("Неделя") + " " + (nw - 1) + messages.getString("-я_по_Пятидесятнице");
+        } else {
+            if (nw == 1) {
+                return messages.getString("Седмица_1-я_по_Пятидесятнице_(Троицкая)");
             } else {
-			    if (nw==1) {
-			        return messages.getString("Седмица_1-я_по_Пятидесятнице_(Троицкая)");
-                } else {
-			    return messages.getString("Седмица") + " " + nw + messages.getString("-я_по_Пятидесятнице");
-                }
-		    }
-	    }
-
-        //return "";
+                return messages.getString("Седмица") + " " + nw + messages.getString("-я_по_Пятидесятнице");
+            }
+        }
+        }
     }
 
     public static Long getEasterDateDiff(LocalDate date) {
